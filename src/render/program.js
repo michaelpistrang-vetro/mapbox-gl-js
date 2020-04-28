@@ -54,7 +54,12 @@ class Program<Us: UniformBindings> {
 
         const staticUniformsInfo = source.staticUniforms ? getTokenizedAttributesAndUniforms(source.staticUniforms) : [];
         const dynamicUniformsInfo = configuration ? configuration.getBinderUniforms() : [];
-        const allUniformsInfo = new Set(staticUniformsInfo.concat(dynamicUniformsInfo));
+        // remove duplicate uniforms
+        const uniformList = staticUniformsInfo.concat(dynamicUniformsInfo);
+        const allUniformsInfo = [];
+        for (const uniform of uniformList) {
+            if (allUniformsInfo.indexOf(uniform) < 0) allUniformsInfo.push(uniform);
+        }
 
         const defines = configuration ? configuration.defines() : [];
         if (showOverdrawInspector) {
