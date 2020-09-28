@@ -60,6 +60,16 @@ test('CanonicalTileID', (t) => {
             t.end();
         });
 
+        t.test('replaces {y} with tms', (t) => {
+            t.equal(new CanonicalTileID(11, 504, 814).url(['{z}/{x}/{y}.json'], 'tms'), '11/504/1233.json');
+            t.end();
+        });
+
+        t.test('replaces {z} with zoomOffset', (t) => {
+            t.equal(new CanonicalTileID(11, 504, 814).url(['{z}/{x}/{y}.json'], 'tms', -1), '10/504/1233.json');
+            t.end();
+        });
+
         t.end();
     });
 

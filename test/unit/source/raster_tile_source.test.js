@@ -139,5 +139,33 @@ test('RasterTileSource', (t) => {
         t.end();
     });
 
+    t.test('applies zoom offset before requesting', (t) => {
+        window.server.respondWith('/source.json', JSON.stringify({
+            minzoom: 0,
+            maxzoom: 22,
+            attribution: "Mapbox",
+            tiles: ["http://example.com/{z}/{x}/{y}.png"],
+            zoomOffset: -1
+        }));
+        const source = createSource({url: "/source.json", zoomOffset: -1});
+        const transformSpy = t.spy(source.map._requestManager, 'transformRequest');
+        source.on('data', (e) => {
+            if (e.sourceDataType === 'metadata') {
+                const tile = {
+                    tileID: new OverscaledTileID(10, 0, 10, 5, 5),
+                    state: 'loading',
+                    loadVectorData () {},
+                    setExpiryData() {}
+                };
+                source.loadTile(tile, () => {});
+                t.ok(transformSpy.calledOnce);
+                t.equal(transformSpy.getCall(0).args[0], 'http://example.com/9/5/5.png');
+                t.equal(transformSpy.getCall(0).args[1], 'Tile');
+                t.end();
+            }
+        });
+        window.server.respond();
+    });
+
     t.end();
 });

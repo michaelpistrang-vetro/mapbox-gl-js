@@ -29,13 +29,12 @@ export class CanonicalTileID {
     }
 
     // given a list of urls, choose a url template and return a tile URL
-    url(urls: Array<string>, scheme: ?string) {
+    url(urls: Array<string>, scheme: ?string, zoomOffset: ?number = 0) {
         const bbox = getTileBBox(this.x, this.y, this.z);
         const quadkey = getQuadkey(this.z, this.x, this.y);
-
         return urls[(this.x + this.y) % urls.length]
             .replace('{prefix}', (this.x % 16).toString(16) + (this.y % 16).toString(16))
-            .replace('{z}', String(this.z))
+            .replace('{z}', String(this.z + zoomOffset))
             .replace('{x}', String(this.x))
             .replace('{y}', String(scheme === 'tms' ? (Math.pow(2, this.z) - this.y - 1) : this.y))
             .replace('{quadkey}', quadkey)
